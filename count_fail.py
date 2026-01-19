@@ -3,7 +3,7 @@ import re
 import os
 
 # 定义日期文件所在的路径（关键！匹配你的文件夹结构）
-diary_path = "ze-diary/白给记录/"
+diary_path = "白给记录/"
 
 # 定义要匹配的日期文件格式（比如 2026-01-04.md）
 date_file_pattern = r"\d{4}-\d{2}-\d{2}\.md"
