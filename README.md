@@ -1,1 +1,1 @@
-![ZE 白给日记徽章](images/ze_badge.png)
+![ZE白给](images/ze白给日记.svg)
