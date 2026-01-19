@@ -10,15 +10,14 @@ on:
 jobs:
   count_fail:
     runs-on: ubuntu-latest
-    # 关键：显式声明读写权限（覆盖全局设置，确保生效）
     permissions:
-      contents: write  # 赋予写入仓库内容的权限
+      contents: write
       pull-requests: write
 
     steps:
     - uses: actions/checkout@v4
       with:
-        fetch-depth: 0  # 拉取完整仓库历史，避免提交冲突
+        fetch-depth: 0
 
     - name: 设置 Python 环境
       uses: actions/setup-python@v5
@@ -32,7 +31,7 @@ jobs:
       uses: stefanzweifel/git-auto-commit-action@v5
       with:
         commit_message: "🔧 自动更新总白给次数"
-        file_pattern: "README.md"  # 仅提交 README.md 的修改
+        file_pattern: "README.md"
         commit_user_name: "github-actions[bot]"
         commit_user_email: "github-actions[bot]@users.noreply.github.com"
-        push_options: "--force-with-lease"  # 解决推送冲突
+        push_options: "--force-with-lease"
