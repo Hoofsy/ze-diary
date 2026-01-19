@@ -6,7 +6,7 @@ on:
   push:
     branches: [ main, master ]  # 兼容 GitHub 新老仓库的默认分支（main/master）
     paths:
-      - "ze-diary/白给记录/*.md"  # 只监听日期文件的变化
+      - "白给记录/*.md"  # 只监听日期文件的变化
       - "README.md"               # 可选：如果改 README 也想触发，就保留
 
 # 运行任务
