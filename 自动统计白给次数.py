@@ -43,9 +43,9 @@ except:
         readme_content = f.read()
 
 # 替换徽章里的数字（匹配「总白给次数-X次」格式）
-badge_pattern = r"https://img.shields.io/badge/总白给次数-\d+次-red.svg"
-new_badge = f"https://img.shields.io/badge/总白给次数-{total_fail}次-red.svg"
-new_readme = re.sub(badge_pattern, new_badge, readme_content)
+text_pattern = r"\*\*总白给次数\*\*：\d+次"
+new_text = f"**总白给次数**：{total_fail}次"
+new_readme = re.sub(text_pattern, new_text, readme_content)
 
 # 保存更新后的 README.md
 with open("README.md", "w", encoding="utf-8") as f:
