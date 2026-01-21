@@ -18,16 +18,14 @@ jobs:
 
       - name: 更新最近更新时间（修复格式+去重）
         run: |
-          # 核心修复：合并--date参数，同时指定格式和本地时区
-          # format-local: 既用local时区，又按指定格式输出
+          # 核心：获取东八区最新提交日期，格式为 YYYY-MM-DD
           LAST_UPDATED=$(git log -1 --format="%cd" --date=format-local:'%Y-%m-%d')
           
           # 调试输出：查看变量值，方便排查（运行日志中可看）
-          echo "获取到的日期：$LAST_UPDATED"
+          echo "获取到的东八区日期：$LAST_UPDATED"
           
-          # 精准替换：确保只替换占位符，且只保留一次「最近更新」
-          # 匹配：最近更新-<!-- LAST_UPDATED -->
-          # 替换：最近更新-$LAST_UPDATED（仅保留一次「最近更新」）
+          # 精准替换：匹配 README 中的「最近更新-占位符」，替换为实际日期
+          # 注意：需保证 README 中的前缀（最近更新-）与此处匹配串完全一致
           sed -i "s/最近更新-<!-- LAST_UPDATED -->/最近更新-$LAST_UPDATED/" README.md
 
       - name: 提交并推送修改
