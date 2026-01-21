@@ -1,25 +1,30 @@
-name: Update README Last Updated
+name: Update README Last Updated (CST/UTC+8)
 on:
   push:
     branches: [main, master]  # 推送到主分支触发
   schedule:
-    - cron: '0 0 * * *'       # 每日定时更新（可选）
+    - cron: '0 0 * * *'       # 每日0点（UTC+8）更新（可选）
 
 jobs:
   update-readme:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - name: 更新最近更新时间（XXXX-XX-XX 格式）
+      - name: 更新最近更新时间（东八区/XXXX-XX-XX 格式）
+        env:
+          TZ: Asia/Shanghai  # 关键：指定东八区时区
         run: |
-          # 获取最新提交时间，格式为 年-月-日（如 2024-05-20）
+          # 获取东八区的最新提交时间，格式为 年-月-日（如 2024-05-20）
           LAST_UPDATED=$(git log -1 --format="%cd" --date=format:'%Y-%m-%d' --date=local)
-          # 精准替换 README 中的占位符
+          # 精准替换占位符
           sed -i "s/最近更新-<!-- LAST_UPDATED -->/最近更新-$LAST_UPDATED/" README.md
       - name: 提交并推送修改
+        env:
+          TZ: Asia/Shanghai
         run: |
           git config --global user.name "github-actions[bot]"
           git config --global user.email "github-actions[bot]@users.noreply.github.com"
           git add README.md
-          git commit -m "Update last updated time to $LAST_UPDATED" || echo "无更新需要提交"
+          # 避免无更新时触发错误
+          git commit -m "Update last updated time to $LAST_UPDATED (CST)" || echo "无更新需要提交"
           git push
