@@ -1,44 +1,39 @@
 name: Update README Last Updated (CST/UTC+8)
 on:
   push:
-    branches: [main, master]  # 推送到主分支触发
+    branches: [main, master]  # 推送到主分支自动触发
   schedule:
-    - cron: '0 16 * * *'      # 东八区0点 = UTC 16点（修复时区）
-  workflow_dispatch:          # 允许手动触发，方便测试
+    - cron: '16 16 * * *'     # 每天东八区00:16自动更新
+  workflow_dispatch:          # 允许手动触发测试
 
 jobs:
   update-readme:
     runs-on: ubuntu-latest
     env:
-      TZ: Asia/Shanghai      # 全局指定东八区，避免重复配置
+      TZ: Asia/Shanghai      # 固定东八区时区
     steps:
       - uses: actions/checkout@v4
         with:
-          fetch-depth: 0      # 拉取完整提交记录，避免git log为空
+          fetch-depth: 0      # 拉取完整提交记录
 
-      - name: 更新最近更新时间（修复格式+去重）
+      - name: 更新最近更新时间
         run: |
-          # 核心：获取东八区最新提交日期，格式为 YYYY-MM-DD
-          LAST_UPDATED=$(git log -1 --format="%cd" --date=format-local:'%Y-%m-%d')
-          
-          # 调试输出：查看变量值，方便排查（运行日志中可看）
-          echo "获取到的东八区日期：$LAST_UPDATED"
-          
-          # 精准替换：匹配 README 中的「最近更新-占位符」，替换为实际日期
-          # 注意：需保证 README 中的前缀（最近更新-）与此处匹配串完全一致
+          # 获取东八区最新提交日期
+          LAST_UPDATED=$(git log -1 --format="%cd" --date=format:'%Y-%m-%d' --date=local)
+          # 打印日期（方便排查）
+          echo "当前东八区日期：$LAST_UPDATED"
+          # 替换README里的占位符
           sed -i "s/最近更新-<!-- LAST_UPDATED -->/最近更新-$LAST_UPDATED/" README.md
 
-      - name: 提交并推送修改
+      - name: 提交修改并推送
         run: |
           git config --global user.name "github-actions[bot]"
           git config --global user.email "github-actions[bot]@users.noreply.github.com"
-          
-          # 检查是否有修改，无修改则不提交（避免报错）
+          # 没修改就不提交，避免报错
           if git diff --quiet README.md; then
-            echo "README无修改，无需提交"
+            echo "README没变化，不用提交"
             exit 0
           fi
-          
           git add README.md
-          git commit -m "Update last updated time to $LAST_UPDATED (CST/UTC+8)"
+          git commit -m "更新最近更新时间为 $LAST_UPDATED（东八区）"
           git push
