@@ -1,6 +1,6 @@
 <p align="center">
   <!-- ZE白给日记图片 -->
-  <img src="images/ze白日记.svg" alt="ZE白日记" width="300">
+  <img src="images/ze白给日记.svg" alt="ZE白给日记" width="300">
 
   <!-- 徽章 -->
   <br>
