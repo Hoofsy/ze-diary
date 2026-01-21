@@ -5,5 +5,5 @@
   <!-- 徽章 -->
   <br>
   <img src="https://img.shields.io/badge/总白给次数-9次-red.svg" alt="总白给次数">
-  <img src="https://img.shields.io/badge/最近更新-2026--01--20-green.svg" alt="最近更新">
+  <img src="https://img.shields.io/badge/最近更新-<!-- 更新日期占位符 -->-green.svg" alt="最近更新">
 </p>
