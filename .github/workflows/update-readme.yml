@@ -3,28 +3,44 @@ on:
   push:
     branches: [main, master]  # 推送到主分支触发
   schedule:
-    - cron: '0 0 * * *'       # 每日0点（UTC+8）更新（可选）
+    - cron: '0 16 * * *'      # 东八区0点 = UTC 16点（修复时区）
+  workflow_dispatch:          # 允许手动触发，方便测试
 
 jobs:
   update-readme:
     runs-on: ubuntu-latest
+    env:
+      TZ: Asia/Shanghai      # 全局指定东八区，避免重复配置
     steps:
       - uses: actions/checkout@v4
-      - name: 更新最近更新时间（东八区/XXXX-XX-XX 格式）
-        env:
-          TZ: Asia/Shanghai  # 关键：指定东八区时区
+        with:
+          fetch-depth: 0      # 拉取完整提交记录，避免git log为空
+
+      - name: 更新最近更新时间（修复格式+去重）
         run: |
-          # 获取东八区的最新提交时间，格式为 年-月-日（如 2024-05-20）
-          LAST_UPDATED=$(git log -1 --format="%cd" --date=format:'%Y-%m-%d' --date=local)
-          # 精准替换占位符
+          # 核心修复：合并--date参数，同时指定格式和本地时区
+          # format-local: 既用local时区，又按指定格式输出
+          LAST_UPDATED=$(git log -1 --format="%cd" --date=format-local:'%Y-%m-%d')
+          
+          # 调试输出：查看变量值，方便排查（运行日志中可看）
+          echo "获取到的日期：$LAST_UPDATED"
+          
+          # 精准替换：确保只替换占位符，且只保留一次「最近更新」
+          # 匹配：最近更新-<!-- LAST_UPDATED -->
+          # 替换：最近更新-$LAST_UPDATED（仅保留一次「最近更新」）
           sed -i "s/最近更新-<!-- LAST_UPDATED -->/最近更新-$LAST_UPDATED/" README.md
+
       - name: 提交并推送修改
-        env:
-          TZ: Asia/Shanghai
         run: |
           git config --global user.name "github-actions[bot]"
           git config --global user.email "github-actions[bot]@users.noreply.github.com"
+          
+          # 检查是否有修改，无修改则不提交（避免报错）
+          if git diff --quiet README.md; then
+            echo "README无修改，无需提交"
+            exit 0
+          fi
+          
           git add README.md
-          # 避免无更新时触发错误
-          git commit -m "Update last updated time to $LAST_UPDATED (CST)" || echo "无更新需要提交"
+          git commit -m "Update last updated time to $LAST_UPDATED (CST/UTC+8)"
           git push
