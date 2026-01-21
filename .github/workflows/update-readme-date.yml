@@ -1,0 +1,23 @@
+name: 自动更新README更新日期
+on:
+  push:
+    branches: [main]  # 推代码到main分支时自动更
+  schedule:
+    - cron: '0 0 * * *'  # 每天凌晨自动更一次
+jobs:
+  update-date:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write  # 给脚本改文件的权限
+    steps:
+      - uses: actions/checkout@v4
+      - name: 修改日期
+        run: |
+          # 获取仓库最新提交的日期
+          LATEST_DATE=$(git log -1 --format=%cd --date=short)
+          # 替换README里的占位符（要先按下面说的加占位符）
+          sed -i "s/<!-- 更新日期占位符 -->/$LATEST_DATE/g" README.md
+      - name: 保存修改
+        uses: stefanzweifel/git-auto-commit-action@v5
+        with:
+          commit_message: "自动更新README更新日期"
