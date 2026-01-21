@@ -1,0 +1,25 @@
+name: Update README Last Updated
+on:
+  push:
+    branches: [main, master]  # 推送到主分支时触发
+  schedule:
+    - cron: '0 0 * * *'       # 每日定时更新（可选）
+
+jobs:
+  update-readme:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4  # 拉取仓库代码
+      - name: 更新最近更新时间
+        run: |
+          # 获取最新提交的本地时间（UTC+8，避免时区偏差）
+          LAST_UPDATED=$(git log -1 --format="%cd" --date=format:'%Y-%m-%d %H:%M:%S' --date=local)
+          # 替换 README 中的占位符（先在 README 里加 <!-- LAST_UPDATED --> 标记）
+          sed -i "s/<!-- LAST_UPDATED -->/最近更新：$LAST_UPDATED/" README.md
+      - name: 提交并推送修改
+        run: |
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+          git add README.md
+          git commit -m "Update last updated time in README" || echo "无更新需要提交"
+          git push
